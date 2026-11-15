@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO &amp; GEO</title>
+    <script src="js/tailwindcss.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body class="pro-ui audit-theme report-page min-h-screen">
+
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="app-header-inner">
+            <div class="app-header-left">
+                <button onclick="window.location.href='app.html'" class="ghost-button">
+                    <i class="fas fa-arrow-left" style="font-size: 11px"></i>
+                </button>
+                <div class="app-logo">
+                    <i class="fas fa-search"></i>
+                </div>
+                <span class="app-title">SEO &amp; GEO</span>
+                <span id="headerUrl" class="app-url-display" title="">—</span>
+                <span id="headerMeta" class="app-breadcrumb" style="display:none;font-size:12px;white-space:nowrap"></span>
+            </div>
+            <div class="app-header-right">
+                <button onclick="copyCurrentUrl()" class="secondary-button" title="复制链接">
+                    <i class="fas fa-link"></i>
+                    <span class="hidden sm:inline">复制链接</span>
+                </button>
+                <button onclick="window.location.href='/'" class="action-button" title="新建分析">
+                    <i class="fas fa-plus"></i>
+                    <span class="hidden sm:inline">新建分析</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Copy feedback -->
+    <div id="copyFeedback" class="copy-feedback">
+        <i class="fas fa-check"></i> 已复制
+    </div>
+
+    <!-- Page Container -->
+    <main class="page-container">
+
+        <!-- Loading -->
+        <div id="loadingIndicator" class="py-20 text-center">
+            <div class="loading-spinner mx-auto mb-3"></div>
+            <span class="text-[var(--text-muted)] text-[13px]">正在加载报告...</span>
+        </div>
+
+        <!-- Results -->
+        <div id="resultsContainer" class="hidden">
+
+            <!-- Report Hero -->
+            <div id="reportHero" class="report-hero fade-in"></div>
+
+            <!-- Metric Strip -->
+            <section class="report-module fade-in" style="animation-delay: 0.08s">
+                <div class="report-module-heading">
+                    <div>
+                        <div class="report-module-kicker">02 · 指标</div>
+                        <h2>关键指标</h2>
+                        <p>页面规模、优化机会和待处理事项汇总。</p>
+                    </div>
+                </div>
+                <div id="metricStrip" class="metric-strip"></div>
+            </section>
+
+            <!-- Insight Strip -->
+            <section class="report-module fade-in" style="animation-delay: 0.12s">
+                <div class="report-module-heading">
+                    <div>
+                        <div class="report-module-kicker">03 · 发现</div>
+                        <h2>主要发现</h2>
+                        <p>本次审核识别出的关键问题和优化机会。</p>
+                    </div>
+                </div>
+                <div id="insightStrip" class="insight-strip"></div>
+            </section>
+
+            <!-- Issue Board -->
+            <div id="issueBoard" class="fade-in" style="animation-delay: 0.16s"></div>
+
+            <!-- Details -->
+            <div id="detailsSection" class="details-section fade-in" style="animation-delay: 0.2s"></div>
+
+        </div>
+    </main>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/report.js"></script>
+    <script>
+        checkAuth();
+
+        function copyCurrentUrl() {
+            const url = document.getElementById('headerUrl')?.textContent;
+            if (!url || url === '—') return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showCopyFeedback();
+                }).catch(() => fallbackCopy(url));
+            } else {
+                fallbackCopy(url);
+            }
+        }
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;left:-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); showCopyFeedback(); } catch(e) {}
+            document.body.removeChild(ta);
+        }
+        function showCopyFeedback() {
+            const fb = document.getElementById('copyFeedback');
+            fb.classList.add('show');
+            setTimeout(() => fb.classList.remove('show'), 1800);
+        }
+    </script>
+</body>
+
+</html>

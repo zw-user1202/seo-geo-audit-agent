@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理面板 - SEO &amp; GEO</title>
+    <script src="js/tailwindcss.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .badge-admin { color: var(--danger); background: var(--danger-dim); border: 1px solid rgba(225, 29, 72, 0.15); }
+        .badge-user { color: var(--accent); background: var(--accent-dim); border: 1px solid var(--border-accent); }
+    </style>
+</head>
+
+<body class="pro-ui audit-theme admin-page min-h-screen">
+    <!-- Header -->
+    <header class="glass-panel sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 flex items-center justify-center rounded-lg bg-[var(--critical-soft)]">
+                    <i class="fas fa-shield-alt text-[var(--critical)] text-[11px]"></i>
+                </div>
+                <div>
+                    <span class="text-[14px] font-semibold text-[var(--text-primary)]">管理控制台</span>
+                    <p class="text-[12px] text-[var(--text-muted)]" id="adminUsername"></p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="window.location.href='/'"
+                    class="text-[13px] text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors flex items-center gap-1.5">
+                    <i class="fas fa-home text-[11px]"></i>
+                    <span>首页</span>
+                </button>
+                <button onclick="logout()"
+                    class="text-[13px] text-[var(--text-muted)] hover:text-[var(--critical)] transition-colors flex items-center gap-1.5">
+                    <i class="fas fa-sign-out-alt text-[11px]"></i>
+                    <span>退出</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+        <!-- Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 fade-in">
+            <div class="stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-[var(--text-muted)] uppercase tracking-[0.2em] mb-1">总用户</p>
+                        <p class="stat-value" id="totalUsers">-</p>
+                    </div>
+                    <div class="stat-icon blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-[var(--text-muted)] uppercase tracking-[0.2em] mb-1">管理员</p>
+                        <p class="stat-value" id="totalAdmins">-</p>
+                    </div>
+                    <div class="stat-icon red">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-[var(--text-muted)] uppercase tracking-[0.2em] mb-1">普通用户</p>
+                        <p class="stat-value" id="totalRegularUsers">-</p>
+                    </div>
+                    <div class="stat-icon purple">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="fade-in" style="animation-delay: 0.15s">
+            <div class="glass-panel p-6 geometric-accent">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-base font-semibold">用户管理</h2>
+                    <button onclick="showAddUserModal()" class="btn-tech btn-tech-primary py-2 px-4 text-xs">
+                        <i class="fas fa-plus"></i>
+                        <span>添加用户</span>
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto border border-[var(--border-medium)]">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>角色</th>
+                                <th>创建时间</th>
+                                <th>最后登录</th>
+                                <th class="text-center">使用次数</th>
+                                <th class="text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody" class="font-mono">
+                            <tr>
+                                <td colspan="6" class="text-center py-10">
+                                    <div class="loading-spinner mx-auto mb-2"></div>
+                                    <span class="text-[var(--text-muted)]">加载中...</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="hidden modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">添加用户</h3>
+                <button onclick="hideAddUserModal()" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addUserForm">
+                <div class="modal-body space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2 uppercase tracking-[0.2em]">
+                            <i class="fas fa-user text-[var(--accent)] mr-1"></i>用户名
+                        </label>
+                        <input type="text" id="newUsername" required class="input-tech" placeholder="输入用户名">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2 uppercase tracking-[0.2em]">
+                            <i class="fas fa-key text-[var(--accent-secondary)] mr-1"></i>密码
+                        </label>
+                        <input type="password" id="newPassword" required class="input-tech" placeholder="输入密码">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2 uppercase tracking-[0.2em]">
+                            <i class="fas fa-tag text-[var(--danger)] mr-1"></i>角色
+                        </label>
+                        <select id="newRole" class="input-tech">
+                            <option value="user">普通用户</option>
+                            <option value="admin">管理员</option>
+                        </select>
+                    </div>
+                    <div id="addUserError" class="hidden p-3.5 border border-[var(--danger)] bg-[var(--danger-dim)] text-[var(--danger)] text-sm leading-relaxed"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="hideAddUserModal()" class="btn-tech flex-1 py-2.5">取消</button>
+                    <button type="submit" id="addUserBtn" class="btn-tech btn-tech-primary flex-1 py-2.5">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="hidden modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑用户</h3>
+                <button onclick="hideEditUserModal()" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editUserForm">
+                <div class="modal-body space-y-4">
+                    <input type="hidden" id="editUserId">
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2 uppercase tracking-[0.2em]">
+                            <i class="fas fa-user text-[var(--accent)] mr-1"></i>用户名
+                        </label>
+                        <input type="text" id="editUsername" disabled class="input-tech opacity-50 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2 uppercase tracking-[0.2em]">
+                            <i class="fas fa-key text-[var(--accent-secondary)] mr-1"></i>新密码 (留空不修改)
+                        </label>
+                        <input type="password" id="editPassword" class="input-tech" placeholder="输入新密码">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2 uppercase tracking-[0.2em]">
+                            <i class="fas fa-tag text-[var(--danger)] mr-1"></i>角色
+                        </label>
+                        <select id="editRole" class="input-tech">
+                            <option value="user">普通用户</option>
+                            <option value="admin">管理员</option>
+                        </select>
+                    </div>
+                    <div id="editUserError" class="hidden p-3.5 border border-[var(--danger)] bg-[var(--danger-dim)] text-[var(--danger)] text-sm leading-relaxed"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="hideEditUserModal()" class="btn-tech flex-1 py-2.5">取消</button>
+                    <button type="submit" id="editUserBtn" class="btn-tech btn-tech-primary flex-1 py-2.5">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "seo-geo-audit-agent",
+  "version": "1.0.0",
+  "description": "An agentic SEO and GEO visibility auditor powered by DeepSeek.",
+  "main": "server.js",
+  "scripts": {
+    "test": "node --test",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "seo",
+    "geo",
+    "audit",
+    "deepseek",
+    "search-visibility"
+  ],
+  "author": "SEO & GEO Audit Agent contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "sqlite3": "^5.1.7",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  }
+}
